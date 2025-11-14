@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<title>Amőba 3x3</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 40px;
+    }
+    #board {
+        display: grid;
+        grid-template-columns: repeat(3, 100px);
+        gap: 5px;
+        margin: 20px auto;
+        width: 320px;
+    }
+    .cell {
+        width: 100px;
+        height: 100px;
+        background: #eee;
+        font-size: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+    .cell:hover {
+        background: #ddd;
+    }
+    #status {
+        font-size: 20px;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Amőba 3×3</h1>
+<div id="status">Játékos következik: X</div>
+<div id="board"></div>
+<p>Lejátszott játékok száma: <strong id="games">0</strong></p>
+<button onclick="resetGame()">Újrakezdés</button>
+
+<script>
+let currentPlayer = "X";
+let board = ["", "", "", "", "", "", "", "", ""];
+let gameActive = true;
+let gameCount = 0;
+
+const statusDiv = document.getElementById("status");
+const gameCountDiv = document.getElementById("games");
+const boardDiv = document.getElementById("board");
+
+// Tábla létrehozása
+function createBoard() {
+    boardDiv.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cell.addEventListener("click", onCellClick);
+        boardDiv.appendChild(cell);
+    }
+}
+
+function onCellClick(e) {
+    const index = e.target.dataset.index;
+
+    if (board[index] !== "" || !gameActive) return;
+
+    board[index] = currentPlayer;
+    e.target.textContent = currentPlayer;
+
+    if (checkWin()) {
+        statusDiv.textContent = `Nyert: ${currentPlayer}!`;
+        gameActive = false;
+        gameCount++;
+        gameCountDiv.textContent = gameCount;
+        return;
+    }
+
+    if (board.every(cell => cell !== "")) {
+        statusDiv.textContent = "Döntetlen!";
+        gameActive = false;
+        gameCount++;
+        gameCountDiv.textContent = gameCount;
+        return;
+    }
+
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+    statusDiv.textContent = `Játékos következik: ${currentPlayer}`;
+}
+
+function checkWin() {
+    const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8], // sorok
+        [0,3,6], [1,4,7], [2,5,8], // oszlopok
+        [0,4,8], [2,4,6]           // átlók
+    ];
+
+    return winPatterns.some(pattern => 
+        pattern.every(index => board[index] === currentPlayer)
+    );
+}
+
+function resetGame() {
+    currentPlayer = "X";
+    board = ["", "", "", "", "", "", "", "", ""];
+    gameActive = true;
+    statusDiv.textContent = "Játékos következik: X";
+    createBoard();
+}
+
+// első render
+createBoard();
+</script>
+
+</body>
+</html>
