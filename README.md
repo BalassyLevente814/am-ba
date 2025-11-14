@@ -1,1 +1,3 @@
-# am-ba
+# amőba
+
+Javascripttel
